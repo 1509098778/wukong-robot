@@ -1,6 +1,7 @@
 # -*- coding: utf-8-*-
 from robot import ASR, TTS, AI, Player, config, constants, utils, statistic
 from robot.Brain import Brain
+from robot.drivers.pixels import pixels
 from snowboy import snowboydecoder
 import time 
 from robot import logging
@@ -39,16 +40,18 @@ class Conversation(object):
 
     def checkRestore(self):
         if self.immersiveMode:
-            self.brain.restore()
+            self.brain.restore()        
 
     def doResponse(self, query, UUID=''):
         statistic.report(1)
         self.interrupt()
+        pixels.think()
         self.appendHistory(0, query, UUID)
         if not self.brain.query(query):
             # 没命中技能，使用机器人回复
             msg = self.ai.chat(query)
             self.say(msg, True, onCompleted=self.checkRestore)
+        pixels.off()
 
     def setImmersiveMode(self, slug):
         self.immersiveMode = slug
@@ -112,13 +115,14 @@ class Conversation(object):
     def activeListen(self):
         """ 主动问一个问题(适用于多轮对话) """
         time.sleep(1)
+        pixels.wakeup()
         Player.play(constants.getData('beep_hi.wav'))        
         listener = snowboydecoder.ActiveListener([constants.getHotwordModel(config.get('hotword', 'wukong.pmdl'))])
         voice = listener.listen(
             silent_count_threshold=config.get('silent_threshold', 15),
             recording_timeout=config.get('recording_timeout', 5) * 4
-        )
-        Player.play(constants.getData('beep_lo.wav'))
+        )        
+        Player.play(constants.getData('beep_lo.wav'))        
         query = self.asr.transcribe(voice)
         utils.check_and_delete(voice)
         return query

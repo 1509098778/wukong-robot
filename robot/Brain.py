@@ -1,6 +1,7 @@
 # -*- coding: utf-8-*-
 from robot import logging
 from robot.sdk.unit import getUnit
+from robot.drivers.pixels import pixels
 from . import plugin_loader
 from . import config
 
@@ -35,7 +36,7 @@ class Brain(object):
 
         Arguments:
         text -- 用户输入
-        """
+        """        
 
         if text.strip() == '':
             self.conversation.say("抱歉，刚刚没听清，能再说一遍吗？", cache=True)

@@ -4,6 +4,7 @@ from robot import config, utils, constants, logging, statistic, Player
 from robot.Updater import Updater
 from robot.ConfigMonitor import ConfigMonitor
 from robot.Conversation import Conversation
+from robot.drivers.pixels import pixels
 from server import server
 from watchdog.observers import Observer
 from subprocess import call
@@ -53,6 +54,7 @@ class Wukong(object):
         if not utils.is_proper_time():
             logger.warning('勿扰模式开启中')
             return
+        pixels.wakeup()
         Player.play(constants.getData('beep_hi.wav'))
         self._conversation.interrupt()    
 
